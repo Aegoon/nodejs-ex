@@ -1,3 +1,4 @@
+var path = require('path');
 //  OpenShift sample Node application
 var express = require('express'),
     app     = express(),
@@ -7,6 +8,7 @@ Object.assign=require('object-assign')
 
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
+app.use(express.static(__dirname + '/views'));
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -62,6 +64,7 @@ app.get('/', function (req, res) {
   if (!db) {
     initDb(function(err){});
   }
+  console.log('__dirname', __dirname);
   if (db) {
     var col = db.collection('counts');
     // Create a document with request IP and current time of request
@@ -70,10 +73,10 @@ app.get('/', function (req, res) {
       if (err) {
         console.log('Error running count. Message:\n'+err);
       }
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+      res.render(path.join(__dirname, 'views/index.html'), { pageCountMessage : count, dbInfo: dbDetails });
     });
   } else {
-    res.render('index.html', { pageCountMessage : null});
+    res.render(path.join(__dirname, 'views/index.html'), { pageCountMessage : null});
   }
 });
 
